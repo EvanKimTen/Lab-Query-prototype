@@ -70,12 +70,12 @@ and g.grant_id = ?
 
 • Show mentorship relations among members who have worked on the same
 project.
---> SELECT DISTINCT lm.member_id, lm.mentor_id, w1.proj_id
+--> SELECT DISTINCT lm.project_id, lm.member_id, lm.mentor_id
 FROM LabMember lm
 JOIN works_on w1 ON lm.member_id = w1.member_id
 JOIN works_on w2 ON lm.mentor_id = w2.member_id
 WHERE lm.mentor_id IS NOT NULL
-  AND w1.proj_id = w2.proj_id;
+  AND w1.project_id = w2.project_id AND lm.project_id = ?
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -94,10 +94,10 @@ select * from Equipment where ...
 
 • Show members currently using a given piece of equipment and the projects they
 are working on.
-=> select u.member_id, from LabMember lm, Project p, works_on w
+=> select w.member_id, w.project_id 
+from LabMember lm, Project p, works_on w
 JOIN Uses u ON lm.member_id = u.member_id
-JOIN Device d ON d.item_id = u.item_id
-where lm.member_id = w.member_id and p.project_id = w.project_id
+where lm.member_id = w.member_id and p.project_id = w.project_id and u.device_number = ?
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
