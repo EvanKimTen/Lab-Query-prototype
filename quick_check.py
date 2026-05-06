@@ -5,8 +5,17 @@ con = sqlite3.connect(DB_NAME)
 
 cursor = con.cursor()
 con.execute("PRAGMA foreign_keys = ON")
-
-print(cursor.execute("SELECT * FROM Uses WHERE member_id = ? and device_number = ? and item_id = ?", (1, 1, 3)))
+results = cursor.execute("""
+select strftime('%Y', pb.publication_date) as year, count(DISTINCT pb.publication_id) as publications
+from Student st
+JOIN Authors a ON st.member_id = a.member_id
+JOIN publication pb ON pb.publication_id = a.publication_id
+group by year
+order by publications desc
+limit 3;
+""").fetchall()
+for row in results: 
+    print(row)
 
 con.close()
 

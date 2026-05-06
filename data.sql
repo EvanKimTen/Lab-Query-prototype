@@ -36,6 +36,12 @@ VALUES (1, 'Automata Project', '2024-01-01', NULL, 12, 'active', 1);
 INSERT INTO Project VALUES (2, 'Data Management Project', '2024-01-02', NULL, 12, 'active', 2);
 INSERT INTO Project VALUES (3, 'Applied ML Project', '2024-01-03', NULL, 12, 'active', 3);
 INSERT INTO Project VALUES (4, 'Clickjacking Defense Project', '2024-01-04', NULL, 12, 'active', 3);
+INSERT INTO Project
+VALUES
+(10, 'Cancer Cell Imaging', '2022-01-01', '2023-06-30', 18, 'completed', 1),
+(11, 'AI Drug Discovery', '2023-01-15', '2023-12-15', 11, 'completed', 2),
+(12, 'Quantum Sensor Lab', '2023-05-01', '2024-03-01', 10, 'active', 1),
+(13, 'Protein Folding Study', '2021-09-01', '2022-12-20', 15, 'completed', 3);
 
 INSERT INTO Works_On(project_id, member_id, hours_of_involvement, _role)
 VALUES (1, 1, 15, 'Leader');
@@ -99,6 +105,7 @@ VALUES (1, 'NSF', 75000.00, '2024-01-01', 12, 1);
 INSERT INTO Grants VALUES (2, 'NIH', 50000.00, '2024-01-02', 12, 2);
 INSERT INTO Grants VALUES (3, 'DARPA', 120000.00, '2024-01-03', 12, 3);
 INSERT INTO Grants VALUES (4, 'Google Research', 45000.00, '2024-01-04', 12, 4);
+
 
 INSERT INTO Authors(member_id, publication_id)
 VALUES (1, 1);

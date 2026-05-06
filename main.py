@@ -11,6 +11,7 @@ con.execute("PRAGMA foreign_keys = ON") # enforcing fk constraints in schema.sql
 def placeholder():
     messagebox.showinfo("Coming Soon", "This feature will be connected later.")
 
+
 def open_project_member_menu():
     win = tk.Toplevel(root)
     win.title("Project & Member Management")
@@ -21,7 +22,7 @@ def open_project_member_menu():
     options = {
         "Query Member": open_query_member_window, #
         "Query Project": open_query_project_window, #
-        "Add Member": add_member_window, # - after deciding, you have to insert into one of the sub tables. (you don't have to, just leave it out.)
+        "Add Member": add_member_window, 
         "Add Project": add_project_window, # 
         "Update Member": update_member_window, # 
         "Update Project": update_project_window, # 
@@ -88,18 +89,8 @@ def add_member_window():
         entry.pack()
         fields[label] = entry
 
-    member_type_var = tk.StringVar(value="Student")
 
-    tk.Label(win, text="member_type").pack()
-    tk.OptionMenu(
-        win,
-        member_type_var,
-        "Student",
-        "Faculty",
-        "Collaborator"
-    ).pack()
-
-    tk.Button(win, text="Add", command=lambda: add_member_project(fields, member_type_var.get(), title)).pack()
+    tk.Button(win, text="Add", command=lambda: add_member_project(fields, title)).pack()
 
 def add_project_window():
     title = "Add Project"
@@ -133,26 +124,6 @@ def add_member_project(fields, member_type, title):
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, values)
         print("Inserted " + values[1])
-
-        member_id = fields["member_id"].get()
-
-        if member_type == "Student":
-            con.execute("""
-                INSERT INTO Student (member_id)
-                VALUES (?)
-            """, (member_id,))
-
-        elif member_type == "Faculty":
-            con.execute("""
-                INSERT INTO Faculty (member_id)
-                VALUES (?)
-            """, (member_id,))
-
-        elif member_type == "Collaborator":
-            con.execute("""
-                INSERT INTO Collaborator (member_id)
-                VALUES (?)
-            """, (member_id,))
 
     elif title == "Add Project":
         values = tuple(clean(fields[name].get()) for name in [
@@ -730,19 +701,106 @@ def open_grant_publication_menu():
 
     tk.Label(win, text="Grant & Publication Reporting", font=("Arial", 16, "bold")).pack(pady=15)
 
-    options = [
-        "Top 5 Projects by Grant Funding",
-        "Top Mentors by Publications",
-        "Student Publications by Major/Year",
-        "Ended Projects Before Date",
-        "Top 3 Publication Years"
-    ]
+    options = {
+        "Top 5 Projects by Grant Funding": top_five_proj_grant_funding, #
+        "Top Mentors by Publications": mentors_by_no_publicatons, #
+        "Student Publications by Major/Year": student_publications, #
+        "Ended Projects Before Date": ended_projs_wind,
+        "Top 3 Publication Years": top_three_pub_years #
+    }
 
-    for option in options:
-        tk.Button(win, text=option, width=35, command=placeholder).pack(pady=3)
+    for option, comamnd in options.items():
+        tk.Button(win, text=option, width=35, command=comamnd).pack(pady=3)
 
 
+def top_five_proj_grant_funding():
+    cursor = con.cursor()
+    cursor.execute("""
+    select g.project_id, sum(g.budget) as total_funding
+    from Grants g, Project p
+    where g.project_id = p.project_id
+    group by g.project_id
+    order by total_funding desc
+    limit 5;
+    """)
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
 
+def mentors_by_no_publicatons():
+    cursor = con.cursor()
+    cursor.execute("""
+    select lm.mentor_id, count(*) as pub_count
+    from LabMember lm
+    JOIN Authors a ON lm.member_id = a.member_id
+    where lm.mentor_id is not null
+    group by lm.mentor_id
+    having count(*) = (
+    select max(pub_count)
+    from (
+        select lm2.mentor_id, count(*) AS pub_count_2
+        FROM LabMember lm2
+        JOIN Authors a2 ON lm2.member_id = a2.member_id
+        where lm2.mentor_id is not null
+        group by lm2.mentor_id
+        ) as mentor_pub_counts
+    );
+    """)
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
+
+def student_publications():
+    cursor = con.cursor()
+    cursor.execute("""
+    select st.major, strftime('%Y', pb.publication_date) as publish_year, count(*)
+    from Publication pb, Student st, Authors a
+    where a.member_id = st.member_id and pb.publication_id = a.publication_id
+    group by st.major, publish_year;
+    """)
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
+
+def ended_projs_wind():
+    title = "Ended Projects Before Date"
+    win = tk.Toplevel(root)
+    win.title(title)
+    win.geometry("400x400")
+
+    tk.Label(win, text="Date (yyyy-mm-dd)", font=("Arial", 16, "bold")).pack(pady=15)
+    device_no_entry = tk.Entry(win)
+    device_no_entry.pack()
+    tk.Button(win, text="Search", command=lambda: ended_projs(device_no_entry.get())).pack()
+
+
+def ended_projs(date):
+    cursor = con.cursor()
+    cursor.execute("""
+    select p.project_id, count(*)
+    from Project p
+    JOIN Grants g ON p.project_id = g.project_id
+    where end_date < ?
+    group by p.project_idInlc
+    """, date)
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
+
+def top_three_pub_years():
+    cursor = con.cursor()
+    cursor.execute("""
+    sselect strftime('%Y', pb.publication_date) as year, count(DISTINCT pb.publication_id) as publications
+    from Student st
+    JOIN Authors a ON st.member_id = a.member_id
+    JOIN publication pb ON pb.publication_id = a.publication_id
+    group by year
+    order by publications desc
+    limit 3;
+    """)
+    results = cursor.fetchall()
+    for row in results:
+        print(row)
 
 def exit_app():
     con.close()
