@@ -15,6 +15,7 @@ CREATE TABLE Device (
  CONSTRAINT chk_device__status
  CHECK (_status IN ('available', 'in_use', 'retired')) 
 ); 
+
 CREATE TABLE LabMember ( -- self-foreign key revised.
  member_id INT PRIMARY KEY, 
  first_name VARCHAR(50) NOT NULL, 
@@ -42,6 +43,7 @@ CREATE TABLE Faculty (
  CONSTRAINT fk_faculty_member 
  FOREIGN KEY (member_id) REFERENCES LabMember(member_id) ON DELETE CASCADE 
 ); 
+
 CREATE TABLE Student ( 
  member_id INT PRIMARY KEY, 
  student_number VARCHAR(30) NOT NULL UNIQUE, 
@@ -50,6 +52,7 @@ CREATE TABLE Student (
  CONSTRAINT fk_student_member 
  FOREIGN KEY (member_id) REFERENCES LabMember(member_id) ON DELETE CASCADE 
 ); 
+
 CREATE TABLE Collaborator ( 
  member_id INT PRIMARY KEY, 
  institutional_affiliation VARCHAR(200) NOT NULL, 
@@ -57,6 +60,7 @@ CREATE TABLE Collaborator (
  CONSTRAINT fk_collaborator_member 
  FOREIGN KEY (member_id) REFERENCES LabMember(member_id) ON DELETE CASCADE 
 );
+
 CREATE TABLE Publication ( 
  publication_id INT PRIMARY KEY, 
  title VARCHAR(300) NOT NULL, 
@@ -64,6 +68,7 @@ CREATE TABLE Publication (
  venue VARCHAR(200) NOT NULL, 
  doi VARCHAR(150) UNIQUE 
 ); 
+
 CREATE TABLE Project ( 
  project_id INT PRIMARY KEY, 
  title VARCHAR(200) NOT NULL, 
@@ -81,6 +86,7 @@ CREATE TABLE Project (
  CONSTRAINT chk_project_duration 
  CHECK (duration IS NULL OR duration >= 0) 
 ); 
+
 CREATE TABLE Grants ( 
  grant_id INT PRIMARY KEY, 
  funding_agency VARCHAR(200) NOT NULL, 
@@ -109,6 +115,7 @@ CREATE TABLE Works_On (
  CONSTRAINT chk_workson_hours 
  CHECK (hours_of_involvement >= 0) 
 ); 
+
 CREATE TABLE Uses ( 
  member_id INT NOT NULL, 
  item_id INT NOT NULL, 
@@ -124,6 +131,7 @@ CREATE TABLE Uses (
  CONSTRAINT chk_uses_dates 
  CHECK (end_date IS NULL OR end_date >= begin_date) 
 );
+
 CREATE TABLE Authors ( 
  member_id INT NOT NULL, 
  publication_id INT NOT NULL, 
