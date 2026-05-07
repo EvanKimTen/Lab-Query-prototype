@@ -101,7 +101,7 @@ def ended_projs(date):
 def top_three_pub_years():
     cursor = con.cursor()
     cursor.execute("""
-    sselect strftime('%Y', pb.publication_date) as year, count(DISTINCT pb.publication_id) as publications
+    select strftime('%Y', pb.publication_date) as year, count(DISTINCT pb.publication_id) as publications
     from Student st
     JOIN Authors a ON st.member_id = a.member_id
     JOIN publication pb ON pb.publication_id = a.publication_id

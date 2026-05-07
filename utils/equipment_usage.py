@@ -304,7 +304,7 @@ def current_users_wind(root):
 def show_current_user_project_per_device(entry):
     cursor = con.cursor()
     cursor.execute("""
-    SELECT DISTINCT lm.member_id, lm.first_name, lm.last_name, w.project_id
+    SELECT DISTINCT lm.member_id, lm.first_name, lm.last_name, w.project_id, p.title
     FROM Uses u
     JOIN LabMember lm ON lm.member_id = u.member_id
     JOIN Works_On w ON w.member_id = lm.member_id
