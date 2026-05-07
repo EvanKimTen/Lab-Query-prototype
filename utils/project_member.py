@@ -5,9 +5,6 @@ from database.db import con
 def clean(value):
     return value if value != "" else None
 
-def placeholder():
-    messagebox.showinfo("Coming Soon", "This feature will be connected later.")
-
 
 def open_project_member_menu(root):
     win = tk.Toplevel(root)
@@ -107,7 +104,7 @@ def add_project_window(root):
     tk.Button(win, text="Add", command=lambda: add_member_project(fields, title)).pack()
 
 
-def add_member_project(fields, title): ## - to double check the code.
+def add_member_project(fields, title): 
     if title == "Add Member":
         values = tuple(clean(fields[name].get()) for name in [
             "member_id", "first_name", "middle_name", "last_name",
@@ -311,10 +308,11 @@ def show_member_by_grant(g_id):
 
     cursor.execute(
     """
-    select DISTINCT lm.member_id, lm.first_name, lm.last_name from LabMember lm, works_on w, Project p, grants g
-    where w.project_id = p.project_id 
-    and w.member_id = lm.member_id 
-    and g.project_id = p.project_id
+    select DISTINCT lm.member_id, lm.first_name, lm.last_name 
+    from LabMember lm, works_on w, Project p, grants g
+    where w.member_id = lm.member_id
+    and w.project_id = p.project_id 
+    and p.project_id = g.project_id
     and g.grant_id = ?
     """, (g_id,)
     )
@@ -328,7 +326,7 @@ def display_mentorship_win(root):
     win.title(title)
     win.geometry("400x400")
     
-    tk.Label(win, text=title, font=("Arial", 16, "bold")).pack(pady=15)
+    tk.Label(win, text="project id", font=("Arial", 16, "bold")).pack(pady=15)
     project_id_entry = tk.Entry(win)
     project_id_entry.pack()
     tk.Button(win, text="Search", command=lambda: show_mentorship_given_proj(project_id_entry.get())).pack()
